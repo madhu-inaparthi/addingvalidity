@@ -1,13 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Hello Express!</title>
+    <title>Marketplace Registration</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="./style.css" />
+    <style>
+      body {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .response {
+        display: none;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello Express!</h1>
-    <p>Showing <code>pages/index.html</code></p>
+    <h1>Marketplace Registration</h1>
+    <p>Create an account to start buying and selling on our platform.</p>
+
+    <form id="registrationForm">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+
+      <button type="submit">Register</button>
+    </form>
+
+    <div id="response" class="response"></div>
+
+    <script>
+      document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+          });
+
+          const data = await response.json();
+          const responseElement = document.getElementById('response');
+
+          responseElement.style.display = 'block';
+
+          if (response.ok) {
+            responseElement.className = 'response success';
+            responseElement.textContent = data.message;
+            document.getElementById('registrationForm').reset();
+          } else {
+            responseElement.className = 'response error';
+            responseElement.textContent = data.message || 'Registration failed';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          const responseElement = document.getElementById('response');
+          responseElement.style.display = 'block';
+          responseElement.className = 'response error';
+          responseElement.textContent = 'An error occurred. Please try again.';
+        }
+      });
+    </script>
   </body>
 </html>
